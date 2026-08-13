@@ -19,7 +19,8 @@
         num.toString(2).padStart(pad, "0");
 
     const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
+    
+    $: weekday = weekdays[time.getDay()];
     $: hours = to_bin(time.getHours(), 5).padStart(6, "-");
     $: minutes = to_bin(time.getMinutes());
     // get 64:th of a second seconds version: Math.round((time.getSeconds() * time.getMilliseconds()) / 937.5)
@@ -103,13 +104,21 @@
                 {@const secondary =
                     config.split && !(i % 2 == 0 ? j % 2 == 0 : j % 2 == 1)}
                 {#if unit === "-"}
-                    <div
-                        class="circle show_inactive_numbers"
-                        style:visibility={"hidden"}
-                        class:clock={config.info === "2"}
-                        class:active={odd_heart}
-                        class:secondary
-                    ></div>
+                    <div class="circle show_inactive_numbers" style:visibility={config.info ? "visible" : "hidden"} class:clock={config.info === "2"} class:active={odd_heart} class:secondary>
+
+                        {#if config.info === "1" }
+                            <div class="legend">{weekday}</div>
+                        {:else if config.info === "2"}
+                            {@const { h, m, s} = analog_rotate(time)}
+                            {@const _ = console.log({s, m, h})}
+
+                            <div id="hour"   style:transform={`rotate(${h}deg)`}></div>
+                            <div id="minute" style:transform={`rotate(${m}deg)`}></div>
+                            <div id="second" style:transform={`rotate(${s}deg)`}></div>
+                            <div id="blob"></div>
+                        {/if}
+
+                    </div>
                 {:else}
                     {@const active = Boolean(Number.parseInt(unit))}
 
@@ -198,6 +207,7 @@
         height: $diameter;
         max-height: $diameter-height-breakpoint;
         margin: 5px;
+        
         //background-color: $inactive;
         fill: $inactive;
         transition: 0.1s;
@@ -233,6 +243,17 @@
         font-family: Roboto Mono;
         font-weight: 700;
         font-size: 3.5rem;
+        background-color: $inactive;
+        color: $main;
+        border-radius: 50%;
+        width: min($diameter, $diameter-height-breakpoint);
+        height: $diameter;
+        max-height: $diameter-height-breakpoint;
+        display: flex;
+        justify-content: center;
+        vertical-align: middle;
+        align-items: center;
+        
     }
 
     .footer {
@@ -259,7 +280,7 @@
     }
 
     .footer svg {
-        height: 1.8rem;
+        height: 1.3rem;
     }
 
     .heart.odd_heart {
