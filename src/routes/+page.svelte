@@ -215,6 +215,7 @@
 
     .Cheps_Color {
         fill: $inactive;
+        transition: 0.1s;
     }
 
     .circle.active .Cheps_Color {
